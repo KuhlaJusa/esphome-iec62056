@@ -417,7 +417,7 @@ void IEC62056Component::loop() {
           ESP_LOGD(TAG, "Meter reported max baud rate: %u bps ('%c')",
                    identification_to_baud_rate_(baud_rate_identification_), baud_rate_identification_);
         }
-        wait_(500, PREPARE_ACK);
+        wait_(75, PREPARE_ACK);
         //set_next_state_(PREPARE_ACK);
       }
       break;
@@ -462,10 +462,11 @@ void IEC62056Component::loop() {
                  identification_to_baud_rate_(baud_rate_char), baud_rate_char);
       }
 
-      data_out_size_ = sizeof(set_baud);
-      memcpy(out_buf_, set_baud, data_out_size_);
-      //out_buf_[3] = baud_rate_char;
-      send_frame_();
+      // data_out_size_ = sizeof(set_baud);
+      // memcpy(out_buf_, set_baud, data_out_size_);
+      // //out_buf_[3] = baud_rate_char;
+      // send_frame_();
+      this->write_str("\006050\r\n");
 
       if (!fixed_baud_rate)
         new_baudrate = identification_to_baud_rate_(baud_rate_char);
