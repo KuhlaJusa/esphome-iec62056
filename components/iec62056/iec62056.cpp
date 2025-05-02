@@ -267,8 +267,8 @@ void IEC62056Component::loop() {
   const uint8_t id_request[5] = {'/', '?', '!', '\r', '\n'};
   //const uint8_t set_baud[6] = {ACK, 0x30, 0x30, 0x30, 0x0d, 0x0a};
   // const uint8_t set_baud[7] = {'0', '6', '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by meter
-  // const uint8_t set_baud[8] = {'\0','0', '6', '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by meter
-  const uint8_t set_baud[6] = { 0x06, '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by meter
+  const uint8_t set_baud[8] = {'\0','0', '6', '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by meter
+  //const uint8_t set_baud[6] = { 0x06, '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by meter
   const uint32_t now = millis();
 
   size_t frame_size;
@@ -417,7 +417,8 @@ void IEC62056Component::loop() {
           ESP_LOGD(TAG, "Meter reported max baud rate: %u bps ('%c')",
                    identification_to_baud_rate_(baud_rate_identification_), baud_rate_identification_);
         }
-        set_next_state_(PREPARE_ACK);
+        wait_(500, PREPARE_ACK);
+        //set_next_state_(PREPARE_ACK);
       }
       break;
 
@@ -466,7 +467,8 @@ void IEC62056Component::loop() {
       //out_buf_[3] = baud_rate_char;
       send_frame_();
 
-      new_baudrate = identification_to_baud_rate_(baud_rate_char);
+      if (!fixed_baud_rate)
+        new_baudrate = identification_to_baud_rate_(baud_rate_char);
 
       // wait for the frame to be fully transmitted before changing baud rate,
       // otherwise port get stuck and no packet can be received (ESP32)
