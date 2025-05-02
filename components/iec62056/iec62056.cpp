@@ -462,11 +462,11 @@ void IEC62056Component::loop() {
                  identification_to_baud_rate_(baud_rate_char), baud_rate_char);
       }
 
-      const uint8_t request_data[6] = { 0x06, '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by mete
+      uint8_t request_data[6] = { 0x06, '0', '5', '0', '\r', '\n'};
 
       data_out_size_ = sizeof(request_data);
       memcpy(out_buf_, request_data, data_out_size_);
-      out_buf_[2] = baud_rate_char;
+      //out_buf_[2] = baud_rate_char;
       send_frame_();
 
 
