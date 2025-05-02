@@ -12,6 +12,7 @@ namespace iec62056 {
 static const uint8_t ETX = 0x03;
 static const uint8_t STX = 0x02;
 static const uint8_t ACK = 0x06;
+static const bool fixed_baud_rate = true
 
 static const char *const TAG = "iec62056.component";
 const uint32_t BAUDRATES[] = {300, 600, 1200, 2400, 4800, 9600, 19200};
@@ -446,7 +447,7 @@ void IEC62056Component::loop() {
         baud_rate_char = baud_rate_identification_;
       }
 
-      if (retry_counter_ > 0) {  // decrease baud rate for retry
+      if (retry_counter_ > 0 && !fixed_baud_rate) {  // decrease baud rate for retry
         baud_rate_char -= retry_counter_;
         if (mode_ == PROTOCOL_MODE_B && baud_rate_char < PROTO_B_RANGE_BEGIN) {
           baud_rate_char = PROTO_B_RANGE_BEGIN;
