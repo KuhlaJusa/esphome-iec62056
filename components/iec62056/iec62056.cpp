@@ -266,9 +266,7 @@ void IEC62056Component::loop() {
 
   const uint8_t id_request[5] = {'/', '?', '!', '\r', '\n'};
   //const uint8_t set_baud[6] = {ACK, 0x30, 0x30, 0x30, 0x0d, 0x0a};
-  // const uint8_t set_baud[7] = {'0', '6', '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by meter
-  const uint8_t set_baud[8] = {'\0','0', '6', '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by meter
-  //const uint8_t set_baud[6] = { 0x06, '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by mete
+  const uint8_t set_baud[6] = { 0x06, '0', '5', '0', '\r', '\n'};
   const uint32_t now = millis();
 
   size_t frame_size;
@@ -462,10 +460,9 @@ void IEC62056Component::loop() {
                  identification_to_baud_rate_(baud_rate_char), baud_rate_char);
       }
 
-      uint8_t request_data[6] = { 0x06, '0', '5', '0', '\r', '\n'};
 
-      data_out_size_ = sizeof(request_data);
-      memcpy(out_buf_, request_data, data_out_size_);
+      data_out_size_ = sizeof(set_baud);
+      memcpy(out_buf_, set_baud, data_out_size_);
       //out_buf_[2] = baud_rate_char;
       send_frame_();
 
