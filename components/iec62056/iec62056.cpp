@@ -461,7 +461,7 @@ void IEC62056Component::loop() {
 
       data_out_size_ = sizeof(set_baud);
       memcpy(out_buf_, set_baud, data_out_size_);
-      out_buf_[5] = baud_rate_char;
+      out_buf_[4] = baud_rate_char;
       send_frame_();
 
       new_baudrate = identification_to_baud_rate_(baud_rate_char);
