@@ -364,7 +364,6 @@ void IEC62056Component::loop() {
       } else {
         set_next_state_(SEND_REQUEST);
       }
-      update_baudrate_(300);  // make sure we start with 300 bps
 
       update_last_transmission_from_meter_timestamp_();
       break;
