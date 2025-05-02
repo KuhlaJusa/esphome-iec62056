@@ -265,7 +265,8 @@ void IEC62056Component::loop() {
   static uint32_t new_baudrate;
 
   const uint8_t id_request[5] = {'/', '?', '!', '\r', '\n'};
-  const uint8_t set_baud[6] = {ACK, 0x30, 0x30, 0x30, 0x0d, 0x0a};
+  //const uint8_t set_baud[6] = {ACK, 0x30, 0x30, 0x30, 0x0d, 0x0a};
+  const uint8_t set_baud[8] = {'\0', '0', '6', '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by meter
   const uint32_t now = millis();
 
   size_t frame_size;
@@ -460,7 +461,7 @@ void IEC62056Component::loop() {
 
       data_out_size_ = sizeof(set_baud);
       memcpy(out_buf_, set_baud, data_out_size_);
-      out_buf_[2] = baud_rate_char;
+      out_buf_[5] = baud_rate_char;
       send_frame_();
 
       new_baudrate = identification_to_baud_rate_(baud_rate_char);
