@@ -480,8 +480,8 @@ void IEC62056Component::loop() {
       // wait for the frame to be fully transmitted before changing baud rate,
       // otherwise port get stuck and no packet can be received (ESP32)
 
-      wait_(250, SET_BAUD_RATE);
-      // wait_(250, WAIT_FOR_STX);
+      // wait_(250, SET_BAUD_RATE);
+      wait_(250, WAIT_FOR_STX);
       break;
 
     case SET_BAUD_RATE:
