@@ -268,7 +268,7 @@ void IEC62056Component::loop() {
   //const uint8_t set_baud[6] = {ACK, 0x30, 0x30, 0x30, 0x0d, 0x0a};
   // const uint8_t set_baud[7] = {'0', '6', '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by meter
   const uint8_t set_baud[8] = {'\0','0', '6', '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by meter
-  //const uint8_t set_baud[6] = { 0x06, '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by meter
+  //const uint8_t set_baud[6] = { 0x06, '0', '5', '0', '\r', '\n'};  // 0x00 is ignored by mete
   const uint32_t now = millis();
 
   size_t frame_size;
