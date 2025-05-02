@@ -265,8 +265,8 @@ void IEC62056Component::loop() {
   static uint32_t new_baudrate;
 
   const uint8_t id_request[5] = {'/', '?', '!', '\r', '\n'};
-  //const uint8_t set_baud[6] = {ACK, 0x30, 0x30, 0x30, 0x0d, 0x0a};
-  const uint8_t set_baud[6] = { 0x06, '0', '5', '0', '\r', '\n'};
+  const uint8_t set_baud[6] = {ACK, 0x30, 0x30, 0x30, 0x0d, 0x0a};
+  //const uint8_t set_baud[6] = { 0x06, '0', '5', '0', '\r', '\n'};
   const uint32_t now = millis();
 
   size_t frame_size;
@@ -449,7 +449,7 @@ void IEC62056Component::loop() {
         baud_rate_char = baud_rate_identification_;
       }
 
-      if (retry_counter_ > 0 && !fixed_baud_rate) {  // decrease baud rate for retry
+      if (retry_counter_ > 0) {  // decrease baud rate for retry
         baud_rate_char -= retry_counter_;
         if (mode_ == PROTOCOL_MODE_B && baud_rate_char < PROTO_B_RANGE_BEGIN) {
           baud_rate_char = PROTO_B_RANGE_BEGIN;
@@ -461,27 +461,27 @@ void IEC62056Component::loop() {
       }
 
 
-      data_out_size_ = sizeof(set_baud);
-      memcpy(out_buf_, set_baud, data_out_size_);
-      //out_buf_[2] = baud_rate_char;
-      send_frame_();
-
-
       // data_out_size_ = sizeof(set_baud);
       // memcpy(out_buf_, set_baud, data_out_size_);
-      // //out_buf_[3] = baud_rate_char;
+      // //out_buf_[2] = baud_rate_char;
       // send_frame_();
+
+
+      data_out_size_ = sizeof(set_baud);
+      memcpy(out_buf_, set_baud, data_out_size_);
+      out_buf_[2] = baud_rate_char;
+      send_frame_();
 
       //this->write_str("\006050\r\n");
 
-      if (!fixed_baud_rate)
-        new_baudrate = identification_to_baud_rate_(baud_rate_char);
+      // if (!fixed_baud_rate)
+      //   new_baudrate = identification_to_baud_rate_(baud_rate_char);
 
       // wait for the frame to be fully transmitted before changing baud rate,
       // otherwise port get stuck and no packet can be received (ESP32)
 
-      //wait_(250, SET_BAUD_RATE);
-      wait_(250, WAIT_FOR_STX);
+      wait_(250, SET_BAUD_RATE);
+      // wait_(250, WAIT_FOR_STX);
       break;
 
     case SET_BAUD_RATE:
