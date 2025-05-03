@@ -429,6 +429,8 @@ void IEC62056Component::loop() {
     case PREPARE_ACK:
       report_state_();
 
+      clear_uart_input_buffer_(); //clear buffer again before sending ACK
+      
       if (mode_ == PROTOCOL_MODE_A) {
         ESP_LOGVV(TAG, "Using PROTOCOL_MODE_A");
         // switching baud rate not supported, start reading data
