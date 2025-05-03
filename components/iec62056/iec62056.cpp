@@ -48,12 +48,12 @@ void IEC62056Component::setup() {
     set_next_state_(INFINITE_WAIT);
   }
 
-  //set baud rate to max baud rate.
-  if(fixed_baud_rate_){
-    ESP_LOGD(TAG, "Switching to new baud rate %u bps ('%c')", new_baudrate, baud_rate_char);
-    update_baudrate_(new_baudrate);
-    break;
-  }
+  // //set baud rate to max baud rate.
+  // if(fixed_baud_rate_){
+  //   ESP_LOGD(TAG, "Switching to new baud rate %u bps ('%c')", new_baudrate, baud_rate_char);
+  //   update_baudrate_(new_baudrate);
+  //   break;
+  // }
 }
 
 void IEC62056Component::dump_config() {
@@ -469,10 +469,7 @@ void IEC62056Component::loop() {
                   identification_to_baud_rate_(baud_rate_char), baud_rate_char);
       }
     
-
       //this->write_str("\006050\r\n");
-
-      
       data_out_size_ = sizeof(set_baud);
       memcpy(out_buf_, set_baud, data_out_size_);
       out_buf_[2] = baud_rate_char;
@@ -483,7 +480,6 @@ void IEC62056Component::loop() {
       wait_(250, WAIT_FOR_STX);
       // wait_(250, SET_BAUD_RATE);
 
-      
       break;
 
     case SET_BAUD_RATE:
