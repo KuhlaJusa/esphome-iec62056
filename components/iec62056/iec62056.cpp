@@ -417,8 +417,8 @@ void IEC62056Component::loop() {
           ESP_LOGD(TAG, "Meter reported max baud rate: %u bps ('%c')",
                    identification_to_baud_rate_(baud_rate_identification_), baud_rate_identification_);
         }
-        // wait_(75, PREPARE_ACK);
-        set_next_state_(PREPARE_ACK);
+        wait_(50, PREPARE_ACK);
+        // set_next_state_(PREPARE_ACK); //if direct switch to PREPARE_ACK, we ran into a timeout.
       }
       break;
 
