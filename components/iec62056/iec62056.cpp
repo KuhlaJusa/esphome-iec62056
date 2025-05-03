@@ -48,12 +48,6 @@ void IEC62056Component::setup() {
     set_next_state_(INFINITE_WAIT);
   }
 
-  // //set baud rate to max baud rate.
-  // if(fixed_baud_rate_){
-  //   ESP_LOGD(TAG, "Switching to new baud rate %u bps ('%c')", new_baudrate, baud_rate_char);
-  //   update_baudrate_(new_baudrate);
-  //   break;
-  // }
 }
 
 void IEC62056Component::dump_config() {
@@ -423,8 +417,8 @@ void IEC62056Component::loop() {
           ESP_LOGD(TAG, "Meter reported max baud rate: %u bps ('%c')",
                    identification_to_baud_rate_(baud_rate_identification_), baud_rate_identification_);
         }
-        wait_(75, PREPARE_ACK);
-        //set_next_state_(PREPARE_ACK);
+        // wait_(75, PREPARE_ACK);
+        set_next_state_(PREPARE_ACK);
       }
       break;
 
