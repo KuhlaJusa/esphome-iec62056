@@ -373,7 +373,7 @@ void IEC62056Component::loop() {
         set_next_state_(SEND_REQUEST);
       }
 
-      //update_baudrate_(config_initial_baud_rate_bps_); // make initial message with initial baud rate
+      update_baudrate_(config_initial_baud_rate_bps_); // make initial message with initial baud rate
 
       update_last_transmission_from_meter_timestamp_();
       break;
