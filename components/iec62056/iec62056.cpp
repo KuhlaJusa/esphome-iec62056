@@ -12,7 +12,6 @@ namespace iec62056 {
 static const uint8_t ETX = 0x03;
 static const uint8_t STX = 0x02;
 static const uint8_t ACK = 0x06;
-static const bool fixed_baud_rate = true;
 
 static const char *const TAG = "iec62056.component";
 const uint32_t BAUDRATES[] = {300, 600, 1200, 2400, 4800, 9600, 19200};
@@ -47,6 +46,13 @@ void IEC62056Component::setup() {
   } else {
     ESP_LOGI(TAG, "No periodic readouts (update_interval=never). Only switch can trigger readout.");
     set_next_state_(INFINITE_WAIT);
+  }
+
+  //set baud rate to max baud rate.
+  if(fixed_baud_rate_){
+    ESP_LOGD(TAG, "Switching to new baud rate %u bps ('%c')", new_baudrate, baud_rate_char);
+    update_baudrate_(new_baudrate);
+    break;
   }
 }
 
@@ -367,6 +373,8 @@ void IEC62056Component::loop() {
         set_next_state_(SEND_REQUEST);
       }
 
+      //update_baudrate_(config_initial_baud_rate_bps_); // make initial message with initial baud rate
+
       update_last_transmission_from_meter_timestamp_();
       break;
 
@@ -449,7 +457,8 @@ void IEC62056Component::loop() {
         baud_rate_char = baud_rate_identification_;
       }
 
-      if (retry_counter_ > 0 && !fixed_baud_rate) {  // decrease baud rate for retry
+
+      if (retry_counter_ > 0 && !fixed_baud_rate_) {  // decrease baud rate for retry if not fixed
         baud_rate_char -= retry_counter_;
         if (mode_ == PROTOCOL_MODE_B && baud_rate_char < PROTO_B_RANGE_BEGIN) {
           baud_rate_char = PROTO_B_RANGE_BEGIN;
@@ -457,31 +466,24 @@ void IEC62056Component::loop() {
           baud_rate_char = PROTO_C_RANGE_BEGIN;
         }
         ESP_LOGD(TAG, "Decreased baud rate for retry %u to: %d bps ('%c').", retry_counter_,
-                 identification_to_baud_rate_(baud_rate_char), baud_rate_char);
+                  identification_to_baud_rate_(baud_rate_char), baud_rate_char);
       }
-
-
-      // data_out_size_ = sizeof(set_baud);
-      // memcpy(out_buf_, set_baud, data_out_size_);
-      // //out_buf_[2] = baud_rate_char;
-      // send_frame_();
-
-
-      data_out_size_ = sizeof(set_baud);
-      memcpy(out_buf_, set_baud, data_out_size_);
-      //out_buf_[2] = baud_rate_char;
-      send_frame_();
+    
 
       //this->write_str("\006050\r\n");
 
-      if (!fixed_baud_rate)
-        new_baudrate = identification_to_baud_rate_(baud_rate_char);
-
+      
+      data_out_size_ = sizeof(set_baud);
+      memcpy(out_buf_, set_baud, data_out_size_);
+      out_buf_[2] = baud_rate_char;
+      send_frame_();
+      new_baudrate = identification_to_baud_rate_(baud_rate_char);
       // wait for the frame to be fully transmitted before changing baud rate,
       // otherwise port get stuck and no packet can be received (ESP32)
-
-      // wait_(250, SET_BAUD_RATE);
       wait_(250, WAIT_FOR_STX);
+      // wait_(250, SET_BAUD_RATE);
+
+      
       break;
 
     case SET_BAUD_RATE:
