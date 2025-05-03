@@ -262,7 +262,7 @@ void IEC62056Component::update_baudrate_(uint32_t baudrate) {
 void IEC62056Component::loop() {
   static char baud_rate_char;
   static bool mode_d_empty_frame_received;
-  static uint32_t new_baudrate;
+  static uint32_t new_baudrate = 0;
 
   const uint8_t id_request[5] = {'/', '?', '!', '\r', '\n'};
   //const uint8_t set_baud[6] = {ACK, 0x30, 0x30, 0x30, 0x0d, 0x0a}; // should be the same but with this we get timeout???
@@ -367,7 +367,12 @@ void IEC62056Component::loop() {
         set_next_state_(SEND_REQUEST);
       }
 
-      update_baudrate_(config_initial_baud_rate_bps_); // make initial message with initial baud rate
+      if (new_baudrate != config_initial_baud_rate_bps_) {
+        ESP_LOGV(TAG, "Switching to initial baud rate %u bps", config_initial_baud_rate_bps_);
+        update_baudrate_(config_initial_baud_rate_bps_);
+      } else {
+        ESP_LOGV(TAG, "Initial baud rate %u bps is already set", config_initial_baud_rate_bps_);
+      }
 
       update_last_transmission_from_meter_timestamp_();
       break;
@@ -463,17 +468,21 @@ void IEC62056Component::loop() {
                   identification_to_baud_rate_(baud_rate_char), baud_rate_char);
       }
     
-      //this->write_str("\006050\r\n");
       data_out_size_ = sizeof(set_baud);
       memcpy(out_buf_, set_baud, data_out_size_);
       out_buf_[2] = baud_rate_char;
       send_frame_();
       new_baudrate = identification_to_baud_rate_(baud_rate_char);
-      // wait for the frame to be fully transmitted before changing baud rate,
-      // otherwise port get stuck and no packet can be received (ESP32)
-      // wait_(250, WAIT_FOR_STX);
-      wait_(250, SET_BAUD_RATE);
-
+      if (new_baudrate == config_initial_baud_rate_bps_) {
+        ESP_LOGV(TAG, "Initial baud rate %u bps ('%c') is used. No need to switch.", config_initial_baud_rate_bps_,
+                 baud_rate_char);
+        set_next_state_(WAIT_FOR_STX);
+      }
+      else{
+        // wait for the frame to be fully transmitted before changing baud rate,
+        // otherwise port get stuck and no packet can be received (ESP32)
+        wait_(250, SET_BAUD_RATE);
+      }
       break;
 
     case SET_BAUD_RATE:
