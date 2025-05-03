@@ -422,7 +422,7 @@ void IEC62056Component::loop() {
           ESP_LOGD(TAG, "Meter reported max baud rate: %u bps ('%c')",
                    identification_to_baud_rate_(baud_rate_identification_), baud_rate_identification_);
         }
-        wait_(50, PREPARE_ACK); //Short wait before sending, otherwise we get a timeout.
+        wait_(100, PREPARE_ACK); //Short wait before sending, otherwise we get a timeout.
       }
       break;
 
@@ -475,7 +475,8 @@ void IEC62056Component::loop() {
       if (new_baudrate == config_initial_baud_rate_bps_) {
         ESP_LOGV(TAG, "Initial baud rate %u bps ('%c') is used. No need to switch.", config_initial_baud_rate_bps_,
                  baud_rate_char);
-        wait_(50, WAIT_FOR_STX);  //needed for ESP8266, otherwise we ran into a timeout every now and then.
+        set_next_state_(WAIT_FOR_STX);
+        // wait_(50, WAIT_FOR_STX);  //needed for ESP8266, otherwise we ran into a timeout every now and then.
       }
       else{
         // wait for the frame to be fully transmitted before changing baud rate,
