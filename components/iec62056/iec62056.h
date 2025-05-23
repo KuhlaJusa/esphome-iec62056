@@ -50,6 +50,7 @@ class IEC62056Component : public Component, public uart::UARTDevice {
   void set_update_interval(uint32_t val) { update_interval_ms_ = val; }
   uint32_t get_update_interval() { return update_interval_ms_; }
   void set_config_baud_rate_max(uint32_t val) { config_baud_rate_max_bps_ = val; }
+  void set_initial_baud_rate(uint32_t val) { config_initial_baud_rate_bps_ = val; }
   void set_connection_timeout_ms(uint32_t val) { connection_timeout_ms_ = val; }
   void set_max_retry_counter(int val) { max_retries_ = val; }
   void set_retry_delay(int val) { retry_delay_ = val; }
@@ -70,6 +71,7 @@ class IEC62056Component : public Component, public uart::UARTDevice {
   void add_on_wait_next_readout_callback(std::function<void()> callback) {
     this->on_wait_next_readout_callback_.add(std::move(callback));
   }
+  void set_fixed_baud_rate(bool flag) { fixed_baud_rate_ = flag; }
 
  protected:
   bool parse_line_(const char *line, std::string &out_obis, std::string &out_value1, std::string &out_value2);
@@ -159,6 +161,8 @@ class IEC62056Component : public Component, public uart::UARTDevice {
   uint32_t update_interval_ms_;
   /// @brief Maximum baud rate from the config or 0 if not set
   uint32_t config_baud_rate_max_bps_;
+  /// @brief Rate the first request is sent at.
+  uint32_t config_initial_baud_rate_bps_;
   /// @brief Configured connection timeout.
   uint32_t connection_timeout_ms_;
   /// @brief Counts number of retries.
@@ -169,6 +173,8 @@ class IEC62056Component : public Component, public uart::UARTDevice {
   uint32_t retry_delay_{10000};
   /// @brief Flag indicating battery meter.
   bool battery_meter_;
+  /// @brief Flag indicating staying at a fixed baud rate.
+    bool fixed_baud_rate_;
   /// @brief The current state of the state machine.
   CommState state_;
   /// @brief Timestamp, the last transmission from the meter.

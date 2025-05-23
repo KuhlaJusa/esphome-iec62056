@@ -24,6 +24,8 @@ CONF_MODE_D = "mode_d"  # protocol mode D
 CONF_BAUD_RATE_MAX = "baud_rate_max"
 CONF_ON_TIMEOUT = "on_timeout"
 CONF_ON_WAIT_NEXT_READOUT = "on_wait_next_readout"
+CONF_FIXED_BAUD_RATE = "fixed_baud_rate"
+CONF_INITIAL_BAUD_RATE = "initial_baud_rate"
 
 iec62056_ns = cg.esphome_ns.namespace("iec62056")
 IEC62056Component = iec62056_ns.class_(
@@ -92,6 +94,8 @@ CONFIG_SCHEMA = cv.All(
                     ),
                 }
             ),
+            cv.Optional(CONF_FIXED_BAUD_RATE, default=False): cv.boolean,
+            cv.Optional(CONF_INITIAL_BAUD_RATE, default=300): validate_baud_rate,
         }
     )
     .extend(cv.COMPONENT_SCHEMA)
@@ -124,6 +128,12 @@ async def to_code(config):
 
     if CONF_MODE_D in config:
         cg.add(var.set_mode_d(config[CONF_MODE_D]))
+
+    if CONF_FIXED_BAUD_RATE in config:
+        cg.add(var.set_fixed_baud_rate(config[CONF_FIXED_BAUD_RATE]))
+
+    if CONF_INITIAL_BAUD_RATE in config:
+        cg.add(var.set_initial_baud_rate(config[CONF_BAUD_RATE_MAX]))
 
     for conf in config.get(CONF_ON_TIMEOUT, []):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
